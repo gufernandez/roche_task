@@ -14,3 +14,20 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/chart', function() {
+
+    // $records_table = DB::table('records')->get();
+
+    $records_table = DB::table('records')
+                            ->where(function($query)
+                            {
+                                $query->where('status_type', 'like', 'Closed - %')
+                                ->where('record_type', '<>', 'Investigation')
+                                ;
+                            })
+                            ->orderBy('compliance_due_date')
+                            ->get();
+
+    return view('chart', ['records' => $records_table]);
+});

@@ -9,30 +9,23 @@
         var this_month = {};
         var months_index = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-        var comp_due_date;
-        var org_date_closed;
-
         var records = {!! json_encode($records) !!};
-        console.log(records);
+
         var format_c_date;
         var format_o_date;
 
         var this_date;
+        var orig_date;
 
         var on_time = 0;
         var init = 1;
 
-        var my_categories = [];
-        var my_data = [];
-        var my_data_t = [];
+        var list_months = [];
 
         for (i=0; i < records.length; i++){
-            comp_due_date = records[i].compliance_due_date;
-            org_date_closed = records[i].original_date_closed;
 
-            format_c_date = comp_due_date.split(/\D/);
-            format_o_date = org_date_closed.split(/\D/);
-
+            format_c_date = records[i].compliance_due_date.split(/\D/);
+            format_o_date = records[i].original_date_closed.split(/\D/);
             this_date = new Date(format_c_date[2],Number(format_c_date[0])-1, format_c_date[1]);
             orig_date = new Date(format_o_date[2],Number(format_o_date[0])-1, format_o_date[1]);
 
@@ -49,16 +42,10 @@
             }
             else if ((this_month["Month"] != this_date.getMonth()) || (this_month["Year"] != this_date.getFullYear())){
 
-                my_categories.push((this_month["Year"].toString()).concat("-", months_index[this_month["Month"]]));
+                list_months.push(this_month);
 
-                my_data.push(Math.round(100*Number(this_month["Records_OnTime"])/Number(this_month["N_Records"])));
+                var this_month = {"Month": this_date.getMonth(), "Year": this_date.getFullYear(), "N_Records": 1, "Records_OnTime": on_time};
 
-                my_data_t.push(this_month["N_Records"]);
-
-                this_month["Month"] = this_date.getMonth();
-                this_month["Year"] = this_date.getFullYear();
-                this_month["N_Records"] = 1;
-                this_month["Records_OnTime"] = on_time;
                 on_time = 0;
             }
             else {
@@ -69,7 +56,41 @@
 
 
         }
+        list_months.push(this_month);
 
+        var my_categories = new Array(list_months.length);
+        var my_data = new Array(list_months.length);
+        var my_data_t = new Array(list_months.length);
+
+        var pos = 0;
+
+        for (i=0; i < list_months.length; i++){
+            console.log("Mês i: "+list_months[i]["Year"]+"/"+list_months[i]["Month"]);
+            for (j=0; j < list_months.length; j++){
+                console.log("i: "+i);
+                console.log("j: "+j);
+                console.log("Mês j: "+list_months[j]["Year"]+"/"+list_months[j]["Month"]);
+
+                if (list_months[i]["Year"] > list_months[j]["Year"])
+                    pos++;
+                if ((list_months[i]["Year"] == list_months[j]["Year"]) && (list_months[i]["Month"] > list_months[j]["Month"]))
+                    pos++;
+
+                console.log("Pos: "+pos);
+
+            }
+
+            my_categories[pos] = (list_months[i]["Year"].toString()).concat("-", months_index[list_months[i]["Month"]]);
+
+            my_data[pos] = Math.round(100*Number(list_months[i]["Records_OnTime"])/Number(list_months[i]["N_Records"]));
+
+            my_data_t[pos] = list_months[i]["N_Records"];
+
+            pos = 0;
+        }
+        console.log(my_categories);
+        console.log(my_data);
+        console.log(my_data_t);
         document.addEventListener('DOMContentLoaded', function () {
           var myChart = Highcharts.chart('container', {
               chart: {
@@ -82,6 +103,11 @@
                   max: 100,
                   title: {
                       text: "Percentage of Completion On Time"
+                  },
+                  labels: {
+                      formatter: function () {
+                          return this.value+"%";
+                      }
                   }
               }, {
                   title: {
@@ -95,6 +121,7 @@
               series: [{
                   type: 'column',
                   yAxis: 0,
+                  name: 'Percentage of Records Completed on Time',
                   data: my_data
               }, {
                   type: 'spline',

@@ -2,19 +2,18 @@
 
 
 @section('content')
-    <h1>Chart</h1>
+
     <div id="container" style="width:100%; height:500px;"></div>
     <script>
-        var month_list = [];
-        var month = {};
+
+        var this_month = {};
         var months_index = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-        month_list
         var comp_due_date;
         var org_date_closed;
 
         var records = {!! json_encode($records) !!};
-
+        console.log(records);
         var format_c_date;
         var format_o_date;
 
@@ -41,60 +40,65 @@
                 on_time = 1;
 
             if (init == 1){
-                month["Month"] = this_date.getMonth();
-                month["Year"] = this_date.getFullYear();
-                month["N_Records"] = 0;
-                month["Records_OnTime"] = on_time;
+                this_month["Month"] = this_date.getMonth();
+                this_month["Year"] = this_date.getFullYear();
+                this_month["N_Records"] = 0;
+                this_month["Records_OnTime"] = on_time;
                 on_time = 0;
                 init = 0;
             }
-            else if ((month["Month"] != this_date.getMonth()) || (month["Year"] != this_date.getFullYear())){
+            else if ((this_month["Month"] != this_date.getMonth()) || (this_month["Year"] != this_date.getFullYear())){
 
-                my_categories.push((month["Year"].toString()).concat("-", months_index[month["Month"]]));
+                my_categories.push((this_month["Year"].toString()).concat("-", months_index[this_month["Month"]]));
 
-                my_data.push(Math.round(100*Number(month["Records_OnTime"])/Number(month["N_Records"])));
+                my_data.push(Math.round(100*Number(this_month["Records_OnTime"])/Number(this_month["N_Records"])));
 
-                my_data_t.push(month["N_Records"]);
+                my_data_t.push(this_month["N_Records"]);
 
-                month_list.push({
-                    "Month": month["Month"],
-                    "Year": month["Year"],
-                    "N_Records": month["N_Records"],
-                    "Records_OnTime": month["Records_OnTime"]
-                });
-
-                month["Month"] = this_date.getMonth();
-                month["Year"] = this_date.getFullYear();
-                month["N_Records"] = 1;
-                month["Records_OnTime"] = on_time;
+                this_month["Month"] = this_date.getMonth();
+                this_month["Year"] = this_date.getFullYear();
+                this_month["N_Records"] = 1;
+                this_month["Records_OnTime"] = on_time;
                 on_time = 0;
             }
             else {
-                month["N_Records"] ++;
-                month["Records_OnTime"] += on_time;
+                this_month["N_Records"] ++;
+                this_month["Records_OnTime"] += on_time;
                 on_time = 0;
             }
 
 
         }
-        console.log(month_list);
-        console.log(my_data);
-        console.log(my_categories);
 
         document.addEventListener('DOMContentLoaded', function () {
           var myChart = Highcharts.chart('container', {
+              chart: {
+                  alignTicks: false
+              },
               title: {
                   text: 'On Time Completion'
               },
+              yAxis: [{
+                  max: 100,
+                  title: {
+                      text: "Percentage of Completion On Time"
+                  }
+              }, {
+                  title: {
+                      text: 'Total Number of Projects'
+                  },
+                  opposite: true
+              }],
               xAxis: {
                   categories: my_categories
               },
               series: [{
                   type: 'column',
-                  name: 'Jane',
+                  yAxis: 0,
                   data: my_data
               }, {
                   type: 'spline',
+                  yAxis: 1,
                   name: 'Total Number of Records',
                   data: my_data_t,
                   marker: {
@@ -110,4 +114,4 @@
 
 @endsection
 
-@section('title',"Charting")
+@section('title',"Records Completion Chart")

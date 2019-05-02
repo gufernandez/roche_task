@@ -11,13 +11,8 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', function() {
 
-Route::get('/chart', function() {
-
-    // $records_table = DB::table('records')->get();
 
     $records_table = DB::table('records')
                             ->where(function($query)

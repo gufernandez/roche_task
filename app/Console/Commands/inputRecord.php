@@ -60,13 +60,6 @@ class inputRecord extends Command
         for ($i = 0; $i < $dataCount; $i ++){
             \App\Record::firstOrCreate($data[$i]);
         }
-        echo "Products data added successfully"."\n";
     }
 
-    // protected function getArguments()
-    // {
-    //     return [
-    //         ['path', InputArgument::REQUIRED, 'required argument example']
-    //     ];
-    // }
 }

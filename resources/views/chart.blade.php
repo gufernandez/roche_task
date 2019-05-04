@@ -35,7 +35,7 @@
             if (init == 1){
                 this_month["Month"] = this_date.getMonth();
                 this_month["Year"] = this_date.getFullYear();
-                this_month["N_Records"] = 0;
+                this_month["N_Records"] = 1;
                 this_month["Records_OnTime"] = on_time;
                 on_time = 0;
                 init = 0;
@@ -65,18 +65,12 @@
         var pos = 0;
 
         for (i=0; i < list_months.length; i++){
-            console.log("Mês i: "+list_months[i]["Year"]+"/"+list_months[i]["Month"]);
             for (j=0; j < list_months.length; j++){
-                console.log("i: "+i);
-                console.log("j: "+j);
-                console.log("Mês j: "+list_months[j]["Year"]+"/"+list_months[j]["Month"]);
 
                 if (list_months[i]["Year"] > list_months[j]["Year"])
                     pos++;
                 if ((list_months[i]["Year"] == list_months[j]["Year"]) && (list_months[i]["Month"] > list_months[j]["Month"]))
                     pos++;
-
-                console.log("Pos: "+pos);
 
             }
 
@@ -88,9 +82,7 @@
 
             pos = 0;
         }
-        console.log(my_categories);
-        console.log(my_data);
-        console.log(my_data_t);
+
         document.addEventListener('DOMContentLoaded', function () {
           var myChart = Highcharts.chart('container', {
               chart: {

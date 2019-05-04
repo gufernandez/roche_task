@@ -13,6 +13,12 @@
 
 Route::get('/', function() {
 
+    return view('welcome');
+});
+
+
+Route::get('/chart', function() {
+
 
     $records_table = DB::table('records')
                             ->where(function($query)
